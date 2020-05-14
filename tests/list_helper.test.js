@@ -1,5 +1,7 @@
 const totalLikes = require('../utils/list_helper').totalLikes
 const favoriteBlog = require('../utils/list_helper').favoriteBlog
+const mostBlogs = require('../utils/list_helper').mostBlogs
+
 
 const blogs = [
   {
@@ -48,6 +50,10 @@ const blogs = [
     __v: 0
   }
 ]
+const authorWithMostBlogs = {
+  author: 'Robert C. Martin',
+  blogs: 3
+}
 
 const listWithOneBlog = [
   {
@@ -59,7 +65,6 @@ const listWithOneBlog = [
     __v: 0
   }
 ]
-
 
 describe('total likes', () => {
   test('when list has only one blog equals the likes of that', () => {
@@ -78,5 +83,11 @@ describe('favorite blog', () => {
 
   test('when lists has many blogs return the one with more likes', () => {
     expect(favoriteBlog(blogs)).toEqual(blogs[2])
+  })
+})
+
+describe('most blogs', () => {
+  test('most blogs', () => {
+    expect(mostBlogs(blogs)).toEqual(authorWithMostBlogs)
   })
 })
