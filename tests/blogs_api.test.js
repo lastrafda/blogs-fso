@@ -5,7 +5,7 @@ const app = require('../app')
 const api = supertest(app)
 
 const Blog = require('../models/blog')
-const { blogsInDb } = require('./blogs_helper')
+const { blogsInDb, initialBlogs } = require('./blogs_helper')
 
 beforeEach(async () => {
   await Blog.deleteMany({})
@@ -30,6 +30,30 @@ test('it renames the id attribute', async () => {
   ;(await blogs).map((blog) => {
     expect(blog.id).toBeDefined()
   })
+})
+
+/**
+ * 4.10
+ */
+test('a valid blog can be added', async () => {
+  const newBlog = {
+    title: 'a simple blog',
+    author: 'myself',
+    url: 'localhost',
+    likes: '15',
+  }
+
+  await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(201)
+    .expect('Content-Type', /application\/json/)
+
+  const response = await api.get('/api/blogs')
+
+  const title = response.body.map((r) => r.title)
+  expect(response.body).toHaveLength(initialBlogs.length + 1)
+  expect(title).toContain('a simple blog')
 })
 
 afterAll(() => {
