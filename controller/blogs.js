@@ -15,6 +15,9 @@ blogsRouter.get('/', (request, response, next) => {
 
 blogsRouter.post('/', (request, response) => {
   const blog = new Blog(request.body)
+  if (typeof blog.likes === 'undefined') {
+    blog.likes = 0
+  }
 
   blog.save().then((result) => {
     response.status(201).json(result)

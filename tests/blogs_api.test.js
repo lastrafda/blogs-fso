@@ -56,6 +56,21 @@ test('a valid blog can be added', async () => {
   expect(title).toContain('a simple blog')
 })
 
+test('it checks if the like property defaults to 0 when creating a blogs without it', async () => {
+  const newBlog = {
+    title: 'a simple blog that noone likes',
+    author: 'myself',
+    url: 'localhost',
+  }
+  const response = await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(201)
+    .expect('Content-Type', /application\/json/)
+
+  expect(response.body.likes).toBe(0)
+})
+
 afterAll(() => {
   mongoose.connection.close()
 })
