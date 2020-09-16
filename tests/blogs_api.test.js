@@ -81,6 +81,8 @@ test('it sends a 400 status code when no title or url are provided', async () =>
   expect(response.body).toHaveLength(initialBlogs.length)
 })
 
+//REFACTORING TESTS
+
 afterAll(() => {
   mongoose.connection.close()
 })
