@@ -56,7 +56,7 @@ test('a valid blog can be added', async () => {
   expect(title).toContain('a simple blog')
 })
 
-test('it checks if the like property defaults to 0 when creating a blogs without it', async () => {
+test('like property defaults to 0 when creating a blogs without it', async () => {
   const newBlog = {
     title: 'a simple blog that noone likes',
     author: 'myself',
@@ -69,6 +69,16 @@ test('it checks if the like property defaults to 0 when creating a blogs without
     .expect('Content-Type', /application\/json/)
 
   expect(response.body.likes).toBe(0)
+})
+
+test('it sends a 400 status code when no title or url are provided', async () => {
+  const newBlog = {
+    author: 'myself',
+  }
+  await api.post('/api/blogs').send(newBlog).expect(400)
+
+  const response = await api.get('/api/blogs')
+  expect(response.body).toHaveLength(initialBlogs.length)
 })
 
 afterAll(() => {
