@@ -6,6 +6,7 @@ const api = supertest(app)
 
 const Blog = require('../models/blog')
 const { blogsInDb, initialBlogs } = require('./blogs_helper')
+const blogs_helper = require('./blogs_helper')
 
 beforeEach(async () => {
   await Blog.deleteMany({})
@@ -82,6 +83,18 @@ test('it sends a 400 status code when no title or url are provided', async () =>
 })
 
 //REFACTORING TESTS
+// 4.13
+test('it can delete a blog', async () => {
+  const blogsAtStart = await blogs_helper.blogsInDb()
+  const blogToDelete = blogsAtStart[0]
+
+  await api.delete(`/api/blogs/${blogToDelete.id}`).expect(204)
+
+  const blogsAtEnd = await blogs_helper.blogsInDb()
+  expect(blogsAtEnd.length).toBe(blogs_helper.initialBlogs.length - 1)
+  const titles = blogsAtEnd.map((b) => b.title)
+  expect(titles).not.toContain(blogToDelete.title)
+})
 
 afterAll(() => {
   mongoose.connection.close()
