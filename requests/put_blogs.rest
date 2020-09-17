@@ -1,0 +1,9 @@
+PUT http://localhost:3003/api/blogs/5f62f254a2a2b7523d99f856 HTTP/1.1
+content-type: application/json
+
+{
+    "title": "Joself",
+    "author": "José Lastra",
+    "url": "https://joself.dev",
+    "likes": 124
+}

@@ -95,26 +95,26 @@ test('deletion of a blog', async () => {
   const titles = blogsAtEnd.map((b) => b.title)
   expect(titles).not.toContain(blogToDelete.title)
 })
-
-afterAll(() => {
-  mongoose.connection.close()
-})
-
 //4.14
 test('modification of a blog', async () => {
   const blogsAtStart = await blogs_helper.blogsInDb()
   const blogToUpdate = blogsAtStart[0]
   const newData = {
     ...blogToUpdate,
-    title: 'updated title',
+    likes: 123,
   }
   const updatedBlog = await api
     .put(`/api/blogs/${blogToUpdate.id}`)
     .send(newData)
     .expect(200)
     .expect('Content-Type', /application\/json/)
-  expect(updatedBlog.body.title).toBe('updated title')
-  expect(updatedBlog.body.likes).toBe(blogToUpdate.likes)
+  expect(updatedBlog.body.title).toBe(blogToUpdate.title)
+  expect(updatedBlog.body.likes).toBe(123)
   const blogsAtEnd = await blogs_helper.blogsInDb()
   expect(blogsAtEnd.length).toBe(blogs_helper.initialBlogs.length)
+})
+
+afterAll(async () => {
+  await Blog.deleteMany({})
+  mongoose.connection.close()
 })
