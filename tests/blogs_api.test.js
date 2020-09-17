@@ -84,7 +84,7 @@ test('it sends a 400 status code when no title or url are provided', async () =>
 
 //REFACTORING TESTS
 // 4.13
-test('it can delete a blog', async () => {
+test('deletion of a blog', async () => {
   const blogsAtStart = await blogs_helper.blogsInDb()
   const blogToDelete = blogsAtStart[0]
 
@@ -98,4 +98,23 @@ test('it can delete a blog', async () => {
 
 afterAll(() => {
   mongoose.connection.close()
+})
+
+//4.14
+test('modification of a blog', async () => {
+  const blogsAtStart = await blogs_helper.blogsInDb()
+  const blogToUpdate = blogsAtStart[0]
+  const newData = {
+    ...blogToUpdate,
+    title: 'updated title',
+  }
+  const updatedBlog = await api
+    .put(`/api/blogs/${blogToUpdate.id}`)
+    .send(newData)
+    .expect(200)
+    .expect('Content-Type', /application\/json/)
+  expect(updatedBlog.body.title).toBe('updated title')
+  expect(updatedBlog.body.likes).toBe(blogToUpdate.likes)
+  const blogsAtEnd = await blogs_helper.blogsInDb()
+  expect(blogsAtEnd.length).toBe(blogs_helper.initialBlogs.length)
 })
