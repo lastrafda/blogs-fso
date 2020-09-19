@@ -29,6 +29,33 @@ describe('when there is initially some blogs saved', () => {
     expect(response.body).toHaveLength(helper.initialBlogs.length)
   })
 })
+
+describe('viewing a specific blog', () => {
+  test('succeeds with a valid id', async () => {
+    const blogsAtStart = await helper.blogsInDb()
+    const blogToView = blogsAtStart[0]
+    console.log(blogToView)
+    const resultBlog = await api
+      .get(`/api/blogs/${blogToView.id}`)
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
+
+    const processedBlogToView = JSON.parse(JSON.stringify(blogToView))
+    expect(resultBlog.body).toEqual(processedBlogToView)
+  })
+
+  test('fails with status code 404 if blogs does not exist', async () => {
+    const validNonexistingId = await helper.nonExistingId()
+
+    await api.get(`/api/blogs/${validNonexistingId}`).expect(404)
+  })
+
+  test('fails with statuscode 400 id is invalid', async () => {
+    const invalidId = '5a3d5da59070081a82a3445'
+    await api.get(`/api/blogs/${invalidId}`).expect(400)
+  })
+})
+
 /**
  * Verifies that the unique identifier property of the blog posts
  * is named id, by default the database names the property _id

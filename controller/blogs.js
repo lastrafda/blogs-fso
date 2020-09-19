@@ -21,12 +21,17 @@ blogsRouter.post('/', async (request, response, next) => {
   //   .catch((error) => next(error))
 })
 
-blogsRouter.get('/:id', async (request, response) => {
-  const blog = await Blog.findById(request.params.id)
-  if (blog) {
-    response.json(blog.toJSON())
-  } else {
-    response.status(404).end()
+blogsRouter.get('/:id', async (request, response, next) => {
+  try {
+    const blog = await Blog.findById(request.params.id)
+    if (blog) {
+      response.json(blog.toJSON())
+    } else {
+      response.status(404).end()
+    }
+  } catch (error) {
+    response.status(400).end()
+    next(error)
   }
 })
 
