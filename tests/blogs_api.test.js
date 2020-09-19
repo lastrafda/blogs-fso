@@ -10,11 +10,9 @@ const blogs_helper = require('./blogs_helper')
 
 beforeEach(async () => {
   await Blog.deleteMany({})
-  let blogObject = new Blog(helper.initialBlogs[0])
-  await blogObject.save()
-
-  blogObject = new Blog(helper.initialBlogs[1])
-  await blogObject.save()
+  let blogObjects = helper.initialBlogs.map((blog) => new Blog(blog))
+  const promiseArray = blogObjects.map((blog) => blog.save())
+  await Promise.all(promiseArray)
 })
 
 test('all blogs are returned', async () => {
