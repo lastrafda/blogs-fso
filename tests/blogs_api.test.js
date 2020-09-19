@@ -67,53 +67,52 @@ test('it renames the id attribute', async () => {
   })
 })
 
-/**
- * 4.10
- */
-test('a valid blog can be added', async () => {
-  const newBlog = {
-    title: 'a simple blog',
-    author: 'myself',
-    url: 'localhost',
-    likes: '15',
-  }
+describe('addition of a new blog', () => {
+  test('a valid blog can be added', async () => {
+    const newBlog = {
+      title: 'a simple blog',
+      author: 'myself',
+      url: 'localhost',
+      likes: '15',
+    }
 
-  await api
-    .post('/api/blogs')
-    .send(newBlog)
-    .expect(201)
-    .expect('Content-Type', /application\/json/)
+    await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(201)
+      .expect('Content-Type', /application\/json/)
 
-  const response = await api.get('/api/blogs')
+    const response = await api.get('/api/blogs')
 
-  const title = response.body.map((r) => r.title)
-  expect(response.body).toHaveLength(initialBlogs.length + 1)
-  expect(title).toContain('a simple blog')
-})
+    const titles = response.body.map((r) => r.title)
+    expect(response.body).toHaveLength(initialBlogs.length + 1)
+    expect(titles).toContain('a simple blog')
+  })
 
-test('like property defaults to 0 when creating a blogs without it', async () => {
-  const newBlog = {
-    title: 'a simple blog that noone likes',
-    author: 'myself',
-    url: 'localhost',
-  }
-  const response = await api
-    .post('/api/blogs')
-    .send(newBlog)
-    .expect(201)
-    .expect('Content-Type', /application\/json/)
+  test('like property defaults to 0 when creating a blogs without it', async () => {
+    const newBlog = {
+      title: 'a simple blog that noone likes',
+      author: 'myself',
+      url: 'localhost',
+    }
+    const response = await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(201)
+      .expect('Content-Type', /application\/json/)
 
-  expect(response.body.likes).toBe(0)
-})
+    expect(response.body.likes).toBe(0)
+  })
 
-test('it sends a 400 status code when no title or url are provided', async () => {
-  const newBlog = {
-    author: 'myself',
-  }
-  await api.post('/api/blogs').send(newBlog).expect(400)
+  test('it sends a 400 status code when no title or url are provided', async () => {
+    const newBlog = {
+      author: 'myself',
+    }
+    await api.post('/api/blogs').send(newBlog).expect(400)
 
-  const response = await api.get('/api/blogs')
-  expect(response.body).toHaveLength(initialBlogs.length)
+    const response = await api.get('/api/blogs')
+    expect(response.body).toHaveLength(initialBlogs.length)
+  })
 })
 
 //REFACTORING TESTS
