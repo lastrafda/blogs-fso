@@ -129,23 +129,24 @@ describe('deletion of a blog', () => {
   })
 })
 
-//4.14
-test('modification of a blog', async () => {
-  const blogsAtStart = await blogs_helper.blogsInDb()
-  const blogToUpdate = blogsAtStart[0]
-  const newData = {
-    ...blogToUpdate,
-    likes: 123,
-  }
-  const updatedBlog = await api
-    .put(`/api/blogs/${blogToUpdate.id}`)
-    .send(newData)
-    .expect(200)
-    .expect('Content-Type', /application\/json/)
-  expect(updatedBlog.body.title).toBe(blogToUpdate.title)
-  expect(updatedBlog.body.likes).toBe(123)
-  const blogsAtEnd = await blogs_helper.blogsInDb()
-  expect(blogsAtEnd.length).toBe(blogs_helper.initialBlogs.length)
+describe('modification of a blog', () => {
+  test('succeeds with valid data', async () => {
+    const blogsAtStart = await blogs_helper.blogsInDb()
+    const blogToUpdate = blogsAtStart[0]
+    const newData = {
+      ...blogToUpdate,
+      likes: 123,
+    }
+    const updatedBlog = await api
+      .put(`/api/blogs/${blogToUpdate.id}`)
+      .send(newData)
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
+    expect(updatedBlog.body.title).toBe(blogToUpdate.title)
+    expect(updatedBlog.body.likes).toBe(123)
+    const blogsAtEnd = await blogs_helper.blogsInDb()
+    expect(blogsAtEnd.length).toBe(blogs_helper.initialBlogs.length)
+  })
 })
 
 afterAll(async () => {
