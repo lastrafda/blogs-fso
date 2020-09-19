@@ -115,19 +115,20 @@ describe('addition of a new blog', () => {
   })
 })
 
-//REFACTORING TESTS
-// 4.13
-test('deletion of a blog', async () => {
-  const blogsAtStart = await blogs_helper.blogsInDb()
-  const blogToDelete = blogsAtStart[0]
+describe('deletion of a blog', () => {
+  test('succeeds with status code 204 if id is valid', async () => {
+    const blogsAtStart = await blogs_helper.blogsInDb()
+    const blogToDelete = blogsAtStart[0]
 
-  await api.delete(`/api/blogs/${blogToDelete.id}`).expect(204)
+    await api.delete(`/api/blogs/${blogToDelete.id}`).expect(204)
 
-  const blogsAtEnd = await blogs_helper.blogsInDb()
-  expect(blogsAtEnd.length).toBe(blogs_helper.initialBlogs.length - 1)
-  const titles = blogsAtEnd.map((b) => b.title)
-  expect(titles).not.toContain(blogToDelete.title)
+    const blogsAtEnd = await blogs_helper.blogsInDb()
+    expect(blogsAtEnd.length).toBe(blogs_helper.initialBlogs.length - 1)
+    const titles = blogsAtEnd.map((b) => b.title)
+    expect(titles).not.toContain(blogToDelete.title)
+  })
 })
+
 //4.14
 test('modification of a blog', async () => {
   const blogsAtStart = await blogs_helper.blogsInDb()
