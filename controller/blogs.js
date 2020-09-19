@@ -1,27 +1,33 @@
 const blogsRouter = require('express').Router()
 const Blog = require('../models/blog')
 
-blogsRouter.get('/', (request, response, next) => {
-  Blog.find({})
-    .then((blogs) => {
-      if (blogs) {
-        response.json(blogs)
-      } else {
-        response.status(404).end()
-      }
-    })
-    .catch((error) => next(error))
+blogsRouter.get('/', async (request, response) => {
+  const blogs = await Blog.find({})
+  response.json(blogs.map((blog) => blog.toJSON()))
 })
 
-blogsRouter.post('/', (request, response, next) => {
+blogsRouter.post('/', async (request, response, next) => {
   const blog = new Blog(request.body)
+  try {
+    const savedBlog = await blog.save()
+    response.status(201).json(savedBlog.toJSON())
+  } catch (error) {
+    next(error)
+  }
+  /** This is how it looks without async/await */
+  // blog
+  //   .save()
+  //   .then((result) => response.status(201).json(result))
+  //   .catch((error) => next(error))
+})
 
-  blog
-    .save()
-    .then((result) => {
-      response.status(201).json(result)
-    })
-    .catch((error) => next(error))
+blogsRouter.get('/:id', async (request, response) => {
+  const blog = await Blog.findById(request.params.id)
+  if (blog) {
+    response.json(blog.toJSON())
+  } else {
+    response.status(404).end()
+  }
 })
 
 blogsRouter.put('/:id', (request, response, next) => {
