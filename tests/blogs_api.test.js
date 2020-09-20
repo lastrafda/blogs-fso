@@ -1,12 +1,11 @@
 const mongoose = require('mongoose')
-const helper = require('./blogs_helper')
+const helper = require('./tests_helper')
 const supertest = require('supertest')
 const app = require('../app')
 const api = supertest(app)
 
 const Blog = require('../models/blog')
-const { blogsInDb, initialBlogs } = require('./blogs_helper')
-const blogs_helper = require('./blogs_helper')
+const { blogsInDb, initialBlogs } = require('./tests_helper')
 
 beforeEach(async () => {
   await Blog.deleteMany({})
@@ -117,13 +116,13 @@ describe('addition of a new blog', () => {
 
 describe('deletion of a blog', () => {
   test('succeeds with status code 204 if id is valid', async () => {
-    const blogsAtStart = await blogs_helper.blogsInDb()
+    const blogsAtStart = await helper.blogsInDb()
     const blogToDelete = blogsAtStart[0]
 
     await api.delete(`/api/blogs/${blogToDelete.id}`).expect(204)
 
-    const blogsAtEnd = await blogs_helper.blogsInDb()
-    expect(blogsAtEnd.length).toBe(blogs_helper.initialBlogs.length - 1)
+    const blogsAtEnd = await helper.blogsInDb()
+    expect(blogsAtEnd.length).toBe(helper.initialBlogs.length - 1)
     const titles = blogsAtEnd.map((b) => b.title)
     expect(titles).not.toContain(blogToDelete.title)
   })
@@ -131,7 +130,7 @@ describe('deletion of a blog', () => {
 
 describe('modification of a blog', () => {
   test('succeeds with valid data', async () => {
-    const blogsAtStart = await blogs_helper.blogsInDb()
+    const blogsAtStart = await helper.blogsInDb()
     const blogToUpdate = blogsAtStart[0]
     const newData = {
       ...blogToUpdate,
@@ -144,8 +143,8 @@ describe('modification of a blog', () => {
       .expect('Content-Type', /application\/json/)
     expect(updatedBlog.body.title).toBe(blogToUpdate.title)
     expect(updatedBlog.body.likes).toBe(123)
-    const blogsAtEnd = await blogs_helper.blogsInDb()
-    expect(blogsAtEnd.length).toBe(blogs_helper.initialBlogs.length)
+    const blogsAtEnd = await helper.blogsInDb()
+    expect(blogsAtEnd.length).toBe(helper.initialBlogs.length)
   })
 })
 

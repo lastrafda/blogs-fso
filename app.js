@@ -3,13 +3,18 @@ const express = require('express')
 const app = express()
 const cors = require('cors')
 const blogsRouter = require('./controller/blogs')
+const usersRouter = require('./controller/users')
 const middleware = require('./utils/middleware')
 const logger = require('./utils/logger')
 const mongoose = require('mongoose')
 
 logger.info(`connecting to ${config.MONGODB_URI}`)
 
-mongoose.connect(config.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+mongoose
+  .connect(config.MONGODB_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
   .then(() => {
     logger.info('Connected to MongoDB')
   })
@@ -23,11 +28,11 @@ app.use(express.json())
 app.use(middleware.requestLogger)
 
 app.use('/api/blogs', blogsRouter)
+app.use('/api/users', usersRouter)
 
 app.use(middleware.unkownEndpoint)
 app.use(middleware.errorHandler)
 
 app.use(express.json())
-
 
 module.exports = app
