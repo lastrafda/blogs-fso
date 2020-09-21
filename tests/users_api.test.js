@@ -7,12 +7,18 @@ const api = supertest(app)
 const bcrypt = require('bcrypt')
 const User = require('../models/user')
 
+let token
+
 describe('when there is initially one user in db', () => {
   beforeEach(async () => {
     await User.deleteMany({})
     const passwordHash = await bcrypt.hash('secret', 10)
     const user = new User({ username: 'root', passwordHash })
-
+    const loginResponse = await api.post('/api/login').send({
+      username: 'root',
+      password: 'secret',
+    })
+    token = loginResponse.body.token
     await user.save()
   })
 
@@ -53,6 +59,29 @@ describe('when there is initially one user in db', () => {
       .expect('Content-Type', /application\/json/)
 
     expect(result.body.error).toContain('`username` to be unique')
+
+    const usersAtEnd = await helper.usersInDb()
+    expect(usersAtEnd).toHaveLength(usersAtStart.length)
+  })
+
+  test('creation fails with proper statuscode and message if password', async () => {
+    const usersAtStart = await helper.usersInDb()
+
+    const newUser = {
+      username: 'lastrafda',
+      name: 'José',
+      password: 'se',
+    }
+
+    const result = await api
+      .post('/api/users')
+      .send(newUser)
+      .expect(400)
+      .expect('Content-Type', /application\/json/)
+
+    expect(result.body.error).toContain(
+      'The Password must contain at least 3 characters'
+    )
 
     const usersAtEnd = await helper.usersInDb()
     expect(usersAtEnd).toHaveLength(usersAtStart.length)

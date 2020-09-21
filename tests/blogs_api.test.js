@@ -5,13 +5,27 @@ const app = require('../app')
 const api = supertest(app)
 
 const Blog = require('../models/blog')
+const User = require('../models/user')
+const bcrypt = require('bcrypt')
 const { blogsInDb, initialBlogs } = require('./tests_helper')
+let token
 
 beforeEach(async () => {
   await Blog.deleteMany({})
   let blogObjects = helper.initialBlogs.map((blog) => new Blog(blog))
   const promiseArray = blogObjects.map((blog) => blog.save())
   await Promise.all(promiseArray)
+
+  /** Creates a new user and set the jwt token */
+  await User.deleteMany({})
+  const passwordHash = await bcrypt.hash('secret', 10)
+  const user = new User({ username: 'root', passwordHash })
+  await user.save()
+  const loginResponse = await api.post('/api/login').send({
+    username: 'root',
+    password: 'secret',
+  })
+  token = loginResponse.body.token
 })
 
 describe('when there is initially some blogs saved', () => {
@@ -77,6 +91,7 @@ describe('addition of a new blog', () => {
 
     await api
       .post('/api/blogs')
+      .set('Authorization', `bearer ${token}`)
       .send(newBlog)
       .expect(201)
       .expect('Content-Type', /application\/json/)
@@ -96,6 +111,7 @@ describe('addition of a new blog', () => {
     }
     const response = await api
       .post('/api/blogs')
+      .set('Authorization', `bearer ${token}`)
       .send(newBlog)
       .expect(201)
       .expect('Content-Type', /application\/json/)
@@ -107,7 +123,11 @@ describe('addition of a new blog', () => {
     const newBlog = {
       author: 'myself',
     }
-    await api.post('/api/blogs').send(newBlog).expect(400)
+    await api
+      .post('/api/blogs')
+      .set('Authorization', `bearer ${token}`)
+      .send(newBlog)
+      .expect(400)
 
     const response = await api.get('/api/blogs')
     expect(response.body).toHaveLength(initialBlogs.length)
