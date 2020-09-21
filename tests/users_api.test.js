@@ -7,18 +7,11 @@ const api = supertest(app)
 const bcrypt = require('bcrypt')
 const User = require('../models/user')
 
-let token
-
 describe('when there is initially one user in db', () => {
   beforeEach(async () => {
     await User.deleteMany({})
     const passwordHash = await bcrypt.hash('secret', 10)
     const user = new User({ username: 'root', passwordHash })
-    const loginResponse = await api.post('/api/login').send({
-      username: 'root',
-      password: 'secret',
-    })
-    token = loginResponse.body.token
     await user.save()
   })
 
