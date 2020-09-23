@@ -1,6 +1,6 @@
 POST http://localhost:3003/api/blogs HTTP/1.1
 content-type: application/json
-Authorization: bearer
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Imxhc3RyYWZkYSIsImlkIjoiNWY2YWUxODdjNWE0ODYwNGM1YjllYjVhIiwiaWF0IjoxNjAwODQwMDgxfQ.qq1NDqYZtEtq7APOrlGfcb81sK1oGYQoxfmrPabpBFU
 
 {
     "title": "Joself",
